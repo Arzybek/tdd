@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 using System.Drawing.Imaging;
 
 namespace TagsCloudVisualization
@@ -8,12 +9,18 @@ namespace TagsCloudVisualization
         public static void Main()
         {
             CircularCloudLayouter ccl = new CircularCloudLayouter(new Point(2500, 2500));
-            var rectSize = new Size(500, 500);
-            for (var i = 0; i < 50; i++)
+//            var rectSize = new Size(500, 500);
+//            var rectSize2 = new Size(300, 300);
+            Random rnd = new Random();
+            
+            for (var i = 0; i < 30; i++)
             {
+                var height = rnd.Next(200, 700);
+                var width = rnd.Next(200, 700);
+                var rectSize = new Size(height, width);
                 ccl.PutNextRectangle(rectSize);
             }
-            
+
             var bitmap = new Bitmap(5000, 5000);
             Graphics graphics = Graphics.FromImage(bitmap);
             SolidBrush brush = new SolidBrush(Color.Black);

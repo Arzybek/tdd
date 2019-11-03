@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using NUnit.Framework;
 
 namespace TagsCloudVisualization
 {
@@ -29,6 +30,7 @@ namespace TagsCloudVisualization
                 if (flag)
                     continue;
                 field.Add(rect);
+                TestContext.WriteLine("It taked {0} iterations", i); 
                 return rect;
             }
         }

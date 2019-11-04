@@ -65,6 +65,11 @@
       <None Include="packages.config" />
     </ItemGroup>
     <ItemGroup>
+      <Content Include="images\image_with.png" />
+      <Content Include="images\image_without.png" />
+      <Content Include="images\many_random.png" />
+      <Content Include="images\one_sized_many_with.png" />
+      <Content Include="images\one_sized_many_without.png" />
       <Content Include="README.md" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

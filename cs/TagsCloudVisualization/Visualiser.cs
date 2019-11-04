@@ -8,18 +8,18 @@ namespace TagsCloudVisualization
     {
         public static void Main()
         {
-            CircularCloudLayouter ccl = new CircularCloudLayouter(new Point(2500, 2500));
+            CircularCloudLayouter ccl = new CircularCloudLayouter(new Point(2000, 2000));
                 //Random
                 
-//            Random rnd = new Random();
-//            
-//            for (var i = 0; i < 30; i++)
-//            {
-//                var height = rnd.Next(200, 700);
-//                var width = rnd.Next(200, 700);
-//                var rectSize = new Size(height, width);
-//                ccl.PutNextRectangle(rectSize);
-//            }
+            Random rnd = new Random();
+            
+            for (var i = 0; i < 500; i++)
+            {
+                var height = rnd.Next(50, 150);
+                var width = rnd.Next(50, 150);
+                var rectSize = new Size(height, width);
+                ccl.PutNextRectangle(rectSize);
+            }
 
             //Two sized
             
@@ -35,14 +35,14 @@ namespace TagsCloudVisualization
 
             //One sized
             
-            var rectSize = new Size(100, 100);
-            
-            for (var i = 0; i < 1000; i++)
-            {
-                ccl.PutNextRectangle(rectSize);
-            }
+//            var rectSize = new Size(100, 100);
+//            
+//            for (var i = 0; i < 1000; i++)
+//            {
+//                ccl.PutNextRectangle(rectSize);
+//            }
 
-            var bitmap = new Bitmap(5000, 5000);
+            var bitmap = new Bitmap(4000, 4000);
             Graphics graphics = Graphics.FromImage(bitmap);
             SolidBrush brush = new SolidBrush(Color.Black);
             Pen pen = new Pen(Color.Red);

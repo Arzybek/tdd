@@ -10,12 +10,14 @@ namespace TagsCloudVisualization
     public class CircularCloudLayouter : MustInitialize<Point>, ICircularCloudLayouter
     {
         private Point _center;
+
         public Point Center
         {
             get { return _center; }
         }
-        
+
         private List<Rectangle> field = new List<Rectangle>();
+
         public List<Rectangle> Field
         {
             get { return field; }
@@ -27,6 +29,11 @@ namespace TagsCloudVisualization
 
         public Rectangle PutNextRectangle(Size rectangleSize)
         {
+            if (rectangleSize.Height <= 0 || rectangleSize.Width <= 0)
+            {
+                throw new ArgumentException("Width and Height should be positive numbers");
+            }
+
             //var i = 0;
             while (true)
             {

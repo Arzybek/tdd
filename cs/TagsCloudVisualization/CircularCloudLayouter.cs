@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows;
-using NUnit.Framework;
 using Point = System.Drawing.Point;
 using Size = System.Drawing.Size;
 
@@ -11,7 +10,16 @@ namespace TagsCloudVisualization
     public class CircularCloudLayouter : MustInitialize<Point>, ICircularCloudLayouter
     {
         private Point _center;
-        public List<Rectangle> field = new List<Rectangle>();
+        public Point Center
+        {
+            get { return _center; }
+        }
+        
+        private List<Rectangle> field = new List<Rectangle>();
+        public List<Rectangle> Field
+        {
+            get { return field; }
+        }
 
         private double spiralCoeff = 1 / (2 * 3.14);
         private double angleStep = 3.14 / 8;
@@ -19,10 +27,10 @@ namespace TagsCloudVisualization
 
         public Rectangle PutNextRectangle(Size rectangleSize)
         {
-            var i = 0;
+            //var i = 0;
             while (true)
             {
-                i++;
+                //i++;
                 var point = getNextSpiralPoint();
                 var top = _center.Y + point.Y + rectangleSize.Height / 2;
                 var left = _center.X + point.X - rectangleSize.Width / 2;
@@ -34,7 +42,7 @@ namespace TagsCloudVisualization
                     continue;
                 rect = moveToCenter(rect);
                 field.Add(rect);
-                TestContext.WriteLine("It taked {0} iterations", i);
+                //TestContext.WriteLine("It taked {0} iterations", i);
                 return rect;
             }
         }
@@ -46,28 +54,30 @@ namespace TagsCloudVisualization
 
         private Rectangle moveToCenter(Rectangle rect)
         {
-            var center = new Vector(_center.X, _center.Y);
             var zero = new Vector(0, 0);
-            var centerXRect = _center.X - (rect.X + rect.Width / 2);
-            var centerYRect = _center.Y - (rect.Y - rect.Height / 2);
-            var vector = new System.Windows.Vector(centerXRect, centerYRect);
-            var tmp = new double[2] { rect.X, rect.Y };
+            var rectCenterX = _center.X - (rect.X + rect.Width / 2);
+            var rectCenterY = _center.Y - (rect.Y - rect.Height / 2);
+            var vector = new Vector(rectCenterX, rectCenterY);
+            var tmp = new double[2] {rect.X, rect.Y};
             Rectangle tmpRect;
+
             if (!vector.Equals(zero))
                 vector.Normalize();
             if (!vector.Equals(zero))
             {
                 while (true)
                 {
-                    tmpRect = new Rectangle((int)tmp[0],(int)tmp[1], rect.Width, rect.Height);
+                    tmpRect = new Rectangle((int) tmp[0], (int) tmp[1], rect.Width, rect.Height);
                     if (CheckIntersection(tmpRect))
                         break;
                     tmp[0] += vector.X;
                     tmp[1] += vector.Y;
                 }
             }
-            var res = new Rectangle((int)(tmp[0]-vector.X), (int)(tmp[1]-vector.Y), rect.Width, rect.Height);
-            return res;
+
+            var lastX = (int) (tmp[0] - vector.X);
+            var lastY = (int) (tmp[1] - vector.Y);
+            return new Rectangle(lastX, lastY, rect.Width, rect.Height);
         }
 
         private bool CheckIntersection(Rectangle getRect)

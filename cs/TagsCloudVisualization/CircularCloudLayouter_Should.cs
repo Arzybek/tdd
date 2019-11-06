@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Windows;
 using FluentAssertions;
-using FluentAssertions.Execution;
 using NUnit.Framework;
 using Point = System.Drawing.Point;
 using Size = System.Drawing.Size;
@@ -26,10 +25,34 @@ namespace TagsCloudVisualization
         {
             var rectSize = new Size(width, height);
             ccl.PutNextRectangle(rectSize);
-            ccl.Field[0].X.Should().Be(-rectSize.Width/2);
-            ccl.Field[0].Y.Should().Be(rectSize.Height/2);
-            ccl.Field[0].Top.Should().Be(rectSize.Height/2);
-            ccl.Field[0].Right.Should().Be(rectSize.Width/2);
+            ccl.Field[0].X.Should().Be(-rectSize.Width / 2);
+            ccl.Field[0].Y.Should().Be(rectSize.Height / 2);
+            ccl.Field[0].Top.Should().Be(rectSize.Height / 2);
+            ccl.Field[0].Right.Should().Be(rectSize.Width / 2);
+        }
+
+        [TestCase(1000)]
+        [TestCase(300)]
+        [TestCase(50)]
+        public void CCL_PutsRectangles(int count)
+        {
+            var rectSize = new Size(50, 50);
+            for (var i = 0; i < count; i++)
+            {
+                ccl.PutNextRectangle(rectSize);
+            }
+
+            Assert.AreEqual(count, ccl.Field.Count);
+        }
+
+        [TestCase(0, 0)]
+        [TestCase(-10, 10)]
+        [TestCase(0, -10)]
+        [TestCase(-10, -10)]
+        public void CCL_ThrowsArgumentException_With_NegativeOrZeroSize(int width, int height)
+        {
+            var rectSize = new Size(width, height);
+            Assert.Throws<ArgumentException>(() => ccl.PutNextRectangle(rectSize));
         }
 
         [Test]
@@ -139,7 +162,7 @@ namespace TagsCloudVisualization
 
             var actualMaxSquare = circleSquare * 0.5;
             (actualMaxSquare <= expCircleSquare).Should().BeTrue();
-            
+
             foreach (var rect in ccl.Field)
             {
                 var rectRadVectorLen = new Vector(rect.X - ccl.Center.X, rect.Y - ccl.Center.Y).Length;

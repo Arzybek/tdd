@@ -10,26 +10,22 @@ namespace TagsCloudVisualization
 {
     public class CircularCloudLayouter : MustInitialize<Point>, ICircularCloudLayouter
     {
-        public Point Center
-        {
-            get;
-        }
+        private SpiralPointsGenerator spiralPointsGenerator = new SpiralPointsGenerator();
+
+        public Point Center { get; }
 
         private List<Rectangle> layout = new List<Rectangle>();
+
         public List<Rectangle> Layout
         {
             get { return layout; }
         }
 
-        private double spiralCoeff = 1 / (2 * 3.14);
-        private double angleStep = 3.14 / 8;
-        private double angle = 0;
-        
         public CircularCloudLayouter(Point center) : base(center)
         {
             this.Center = center;
         }
-        
+
         public Rectangle PutNextRectangle(Size rectangleSize)
         {
             if (rectangleSize.Height <= 0 || rectangleSize.Width <= 0)
@@ -39,11 +35,11 @@ namespace TagsCloudVisualization
 
             while (true)
             {
-                var point = getNextSpiralPoint();
+                var point = spiralPointsGenerator.getNextSpiralPoint();
                 var top = Center.Y + point.Y + rectangleSize.Height / 2;
                 var left = Center.X + point.X - rectangleSize.Width / 2;
                 var rect = new Rectangle(new Point(left, top),
-                    rectangleSize); 
+                    rectangleSize);
 
                 if (CheckIntersection(rect))
                     continue;
@@ -84,15 +80,6 @@ namespace TagsCloudVisualization
         private bool CheckIntersection(Rectangle getRect)
         {
             return layout.Any(getRect.IntersectsWith);
-        }
-
-        private Point getNextSpiralPoint()
-        {
-            int X = (int) Math.Floor(spiralCoeff * angle * Math.Cos(angle));
-            int Y = (int) Math.Floor(spiralCoeff * angle * Math.Sin(angle));
-            var point = new Point(X, Y);
-            angle += angleStep;
-            return point;
         }
     }
 }

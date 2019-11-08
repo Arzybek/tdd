@@ -138,8 +138,8 @@ namespace TagsCloudVisualization
         }
 
         [TestCase(9)]
-        [TestCase(13)]
-        [TestCase(5)]
+        [TestCase(16)]
+        [TestCase(25)]
         public void CCL_Layout_CheckThickness(int count)
         {
             var rectSize = new Size(50, 50);
@@ -158,7 +158,7 @@ namespace TagsCloudVisualization
             }
 
             var outerCircleSquare = rectanglesSquare * Math.PI / 2;
-            var actualAcceptableSquare = circleSquare * 0.5;
+            var actualAcceptableSquare = circleSquare * 0.45;
 
             (actualAcceptableSquare <= outerCircleSquare).Should().BeTrue();
         }

@@ -46,7 +46,7 @@ namespace TagsCloudVisualization
             }
 
             CircularCloudLayouter testCcl = new CircularCloudLayouter(new Point(2000, 2000));
-            for (var i = 0; i < 9; i++)
+            for (var i = 0; i < 25; i++)
             {
                 testCcl.PutNextRectangle(new Size(300, 300));
             }

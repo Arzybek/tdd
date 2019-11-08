@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using System.Windows;
 using Point = System.Drawing.Point;
 using Size = System.Drawing.Size;
@@ -9,24 +10,26 @@ namespace TagsCloudVisualization
 {
     public class CircularCloudLayouter : MustInitialize<Point>, ICircularCloudLayouter
     {
-        private Point _center;
-
         public Point Center
         {
-            get { return _center; }
+            get;
         }
 
-        private List<Rectangle> field = new List<Rectangle>();
-
-        public List<Rectangle> Field
+        private List<Rectangle> layout = new List<Rectangle>();
+        public List<Rectangle> Layout
         {
-            get { return field; }
+            get { return layout; }
         }
 
         private double spiralCoeff = 1 / (2 * 3.14);
         private double angleStep = 3.14 / 8;
         private double angle = 0;
-
+        
+        public CircularCloudLayouter(Point center) : base(center)
+        {
+            this.Center = center;
+        }
+        
         public Rectangle PutNextRectangle(Size rectangleSize)
         {
             if (rectangleSize.Height <= 0 || rectangleSize.Width <= 0)
@@ -34,36 +37,27 @@ namespace TagsCloudVisualization
                 throw new ArgumentException("Width and Height should be positive numbers");
             }
 
-            //var i = 0;
             while (true)
             {
-                //i++;
                 var point = getNextSpiralPoint();
-                var top = _center.Y + point.Y + rectangleSize.Height / 2;
-                var left = _center.X + point.X - rectangleSize.Width / 2;
+                var top = Center.Y + point.Y + rectangleSize.Height / 2;
+                var left = Center.X + point.X - rectangleSize.Width / 2;
                 var rect = new Rectangle(new Point(left, top),
-                    rectangleSize); // point - левый верхний угол, size - ширина/высота
+                    rectangleSize); 
 
-                var flag = CheckIntersection(rect);
-                if (flag)
+                if (CheckIntersection(rect))
                     continue;
                 rect = moveToCenter(rect);
-                field.Add(rect);
-                //TestContext.WriteLine("It taked {0} iterations", i);
+                layout.Add(rect);
                 return rect;
             }
-        }
-
-        public CircularCloudLayouter(Point center) : base(center)
-        {
-            this._center = center;
         }
 
         private Rectangle moveToCenter(Rectangle rect)
         {
             var zero = new Vector(0, 0);
-            var rectCenterX = _center.X - (rect.X + rect.Width / 2);
-            var rectCenterY = _center.Y - (rect.Y - rect.Height / 2);
+            var rectCenterX = Center.X - (rect.X + rect.Width / 2);
+            var rectCenterY = Center.Y - (rect.Y - rect.Height / 2);
             var vector = new Vector(rectCenterX, rectCenterY);
             var tmp = new double[2] {rect.X, rect.Y};
             Rectangle tmpRect;
@@ -89,13 +83,7 @@ namespace TagsCloudVisualization
 
         private bool CheckIntersection(Rectangle getRect)
         {
-            foreach (var rectangle in field)
-            {
-                if (getRect.IntersectsWith(rectangle))
-                    return true;
-            }
-
-            return false;
+            return layout.Any(getRect.IntersectsWith);
         }
 
         private Point getNextSpiralPoint()

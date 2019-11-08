@@ -25,10 +25,10 @@ namespace TagsCloudVisualization
         {
             var rectSize = new Size(width, height);
             ccl.PutNextRectangle(rectSize);
-            ccl.Field[0].X.Should().Be(-rectSize.Width / 2);
-            ccl.Field[0].Y.Should().Be(rectSize.Height / 2);
-            ccl.Field[0].Top.Should().Be(rectSize.Height / 2);
-            ccl.Field[0].Right.Should().Be(rectSize.Width / 2);
+            ccl.Layout[0].X.Should().Be(-rectSize.Width / 2);
+            ccl.Layout[0].Y.Should().Be(rectSize.Height / 2);
+            ccl.Layout[0].Top.Should().Be(rectSize.Height / 2);
+            ccl.Layout[0].Right.Should().Be(rectSize.Width / 2);
         }
 
         [TestCase(1000)]
@@ -42,21 +42,35 @@ namespace TagsCloudVisualization
                 ccl.PutNextRectangle(rectSize);
             }
 
-            Assert.AreEqual(count, ccl.Field.Count);
+            count.Should().Be(ccl.Layout.Count);
         }
 
-        [TestCase(0, 0)]
-        [TestCase(-10, 10)]
-        [TestCase(0, -10)]
-        [TestCase(-10, -10)]
+        [TestCase(0, 0, TestName = "Two zeros")]
+        [TestCase(-10, -10, TestName = "Two negatives")]
+        [TestCase(-10, 0, TestName = "Negative and zero")]
+        [TestCase(10, 0, TestName = "Positive and zero")]
+        [TestCase(-10, 10, TestName = "Negative and Positive")]
+        [TestCase(10, -10, TestName = "Positive and Negative")]
         public void CCL_ThrowsArgumentException_With_NegativeOrZeroSize(int width, int height)
         {
             var rectSize = new Size(width, height);
-            Assert.Throws<ArgumentException>(() => ccl.PutNextRectangle(rectSize));
+            ccl.Invoking(y => y.PutNextRectangle(rectSize)).ShouldThrow<ArgumentException>();
+        }
+
+        private void CheckIntersection_EachWithEach()
+        {
+            for (var i = 0; i < ccl.Layout.Count; i++)
+            {
+                var rect = ccl.Layout[i];
+                for (var j = i + 1; j < ccl.Layout.Count; j++)
+                {
+                    rect.IntersectsWith(ccl.Layout[j]).Should().Be(false);
+                }
+            }
         }
 
         [Test]
-        public void ManyRandomSizedRectangles_NotIntersects()
+        public void CCL_PutManyRandomSizedRectangles_NotIntersects()
         {
             Random rnd = new Random();
 
@@ -68,41 +82,27 @@ namespace TagsCloudVisualization
                 ccl.PutNextRectangle(rectSize);
             }
 
-            for (var i = 0; i < ccl.Field.Count; i++)
-            {
-                var rect = ccl.Field[i];
-                for (var j = i + 1; j < ccl.Field.Count; j++)
-                {
-                    rect.IntersectsWith(ccl.Field[j]).Should().Be(false);
-                }
-            }
+            CheckIntersection_EachWithEach();
         }
 
         [Test]
-        public void ManyTwoSizedRectangles_NotIntersects()
+        public void CCL_PutManyTwoSizedRectangles_NotIntersects()
         {
             var rectSize = new Size(50, 50);
             var rectSize2 = new Size(30, 30);
 
-            for (var i = 0; i < 30; i++)
+            for (var i = 0; i < 40; i++)
             {
                 if (i % 2 == 0)
                     ccl.PutNextRectangle(rectSize);
                 else ccl.PutNextRectangle(rectSize2);
             }
 
-            for (var i = 0; i < ccl.Field.Count; i++)
-            {
-                var rect = ccl.Field[i];
-                for (var j = i + 1; j < ccl.Field.Count; j++)
-                {
-                    rect.IntersectsWith(ccl.Field[j]).Should().Be(false);
-                }
-            }
+            CheckIntersection_EachWithEach();
         }
 
         [Test]
-        public void ManyOneSizedRectangles_NotIntersects()
+        public void CCL_PutManyOneSizedRectangles_NotIntersects()
         {
             var rectSize = new Size(50, 50);
 
@@ -111,38 +111,22 @@ namespace TagsCloudVisualization
                 ccl.PutNextRectangle(rectSize);
             }
 
-            for (var i = 0; i < ccl.Field.Count; i++)
-            {
-                var rect = ccl.Field[i];
-                for (var j = i + 1; j < ccl.Field.Count; j++)
-                {
-                    rect.IntersectsWith(ccl.Field[j]).Should().Be(false);
-                }
-            }
+            CheckIntersection_EachWithEach();
         }
 
-        [TestCase(9)]
-        [TestCase(13)]
-        [TestCase(5)]
-        public void CheckThickness_And_CircleForm(int count)
+        private double getOuterCircleRadius()
         {
-            var rectSize = new Size(50, 50);
-            for (var i = 0; i < count; i++)
-            {
-                ccl.PutNextRectangle(rectSize);
-            }
-
             int maxX = 0, minX = 0, maxY = 0, minY = 0;
-            for (var i = 0; i < ccl.Field.Count; i++)
+            for (var i = 0; i < ccl.Layout.Count; i++)
             {
-                if (ccl.Field[i].Y > maxY)
-                    maxY = ccl.Field[i].Y;
-                if (ccl.Field[i].Y - ccl.Field[i].Height < minY)
-                    minY = ccl.Field[i].Y - ccl.Field[i].Height;
-                if (ccl.Field[i].X + ccl.Field[i].Width > maxX)
-                    maxX = ccl.Field[i].X + ccl.Field[i].Width;
-                if (ccl.Field[i].X < minX)
-                    minX = ccl.Field[i].X;
+                if (ccl.Layout[i].Y > maxY)
+                    maxY = ccl.Layout[i].Y;
+                if (ccl.Layout[i].Y - ccl.Layout[i].Height < minY)
+                    minY = ccl.Layout[i].Y - ccl.Layout[i].Height;
+                if (ccl.Layout[i].X + ccl.Layout[i].Width > maxX)
+                    maxX = ccl.Layout[i].X + ccl.Layout[i].Width;
+                if (ccl.Layout[i].X < minX)
+                    minX = ccl.Layout[i].X;
             }
 
             int X = Math.Max(Math.Abs(maxX), Math.Abs(minX));
@@ -150,23 +134,51 @@ namespace TagsCloudVisualization
 
             var radiusInnerCircle = Math.Max(X, Y);
             var radiusOuterCircle = radiusInnerCircle * Math.Sqrt(2);
-            var circleSquare = Math.PI * radiusOuterCircle * radiusOuterCircle;
+            return radiusOuterCircle;
+        }
 
-            var rectanglesSquare = 0;
-            for (var i = 0; i < ccl.Field.Count; i++)
+        [TestCase(9)]
+        [TestCase(13)]
+        [TestCase(5)]
+        public void CCL_Layout_CheckThickness(int count)
+        {
+            var rectSize = new Size(50, 50);
+            for (var i = 0; i < count; i++)
             {
-                rectanglesSquare += ccl.Field[i].Width * ccl.Field[i].Height;
+                ccl.PutNextRectangle(rectSize);
             }
 
-            var expCircleSquare = rectanglesSquare * Math.PI / 2;
+            var radiusOuterCircle = getOuterCircleRadius();
+            var circleSquare = Math.PI * radiusOuterCircle * radiusOuterCircle;
+            var rectanglesSquare = 0;
 
-            var actualMaxSquare = circleSquare * 0.5;
-            (actualMaxSquare <= expCircleSquare).Should().BeTrue();
-
-            foreach (var rect in ccl.Field)
+            for (var i = 0; i < ccl.Layout.Count; i++)
             {
-                var rectRadVectorLen = new Vector(rect.X - ccl.Center.X, rect.Y - ccl.Center.Y).Length;
-                (rectRadVectorLen <= radiusOuterCircle).Should().BeTrue();
+                rectanglesSquare += ccl.Layout[i].Width * ccl.Layout[i].Height;
+            }
+
+            var outerCircleSquare = rectanglesSquare * Math.PI / 2;
+            var actualAcceptableSquare = circleSquare * 0.5;
+
+            (actualAcceptableSquare <= outerCircleSquare).Should().BeTrue();
+        }
+
+        [TestCase(9)]
+        [TestCase(13)]
+        [TestCase(5)]
+        public void CCL_Layout_CheckCircleForm(int count)
+        {
+            var rectSize = new Size(50, 50);
+            for (var i = 0; i < count; i++)
+            {
+                ccl.PutNextRectangle(rectSize);
+            }
+
+            var radiusOuterCircle = getOuterCircleRadius();
+            foreach (var rect in ccl.Layout)
+            {
+                var rectangleRadiusVectorLen = new Vector(rect.X - ccl.Center.X, rect.Y - ccl.Center.Y).Length;
+                (rectangleRadiusVectorLen <= radiusOuterCircle).Should().BeTrue();
             }
         }
     }

@@ -13,8 +13,8 @@ namespace TagsCloudVisualization
             SolidBrush brush = new SolidBrush(Color.Black);
             Pen pen = new Pen(Color.Red, 10);
             graphics.Clear(Color.White);
-            graphics.FillRectangles(brush, ccl.Field.ToArray());
-            graphics.DrawRectangles(pen, ccl.Field.ToArray());
+            graphics.FillRectangles(brush, ccl.Layout.ToArray());
+            graphics.DrawRectangles(pen, ccl.Layout.ToArray());
             return bitmap;
         }
 

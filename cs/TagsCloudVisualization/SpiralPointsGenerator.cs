@@ -5,7 +5,7 @@ namespace TagsCloudVisualization
 {
     public class SpiralPointsGenerator
     {
-        private double spiralCoeff = 1 / (2 * 3.14);
+        private double spiralCoeff = 1 / (2 * Math.PI);
         private double angleStep = 3.14 / 8;
         private double angle = 0;
         

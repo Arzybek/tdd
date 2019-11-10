@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Drawing;
 using System.Linq;
 using System.Windows;
+using FluentAssertions;
 using Point = System.Drawing.Point;
 using Size = System.Drawing.Size;
 
@@ -10,16 +12,15 @@ namespace TagsCloudVisualization
 {
     public class CircularCloudLayouter : MustInitialize<Point>, ICircularCloudLayouter
     {
-        private SpiralPointsGenerator spiralPointsGenerator = new SpiralPointsGenerator();
-
         public Point Center { get; }
 
-        private List<Rectangle> layout = new List<Rectangle>();
-
-        public List<Rectangle> Layout
+        public ReadOnlyCollection<Rectangle> RectanglesList
         {
-            get { return layout; }
+            get { return layout.AsReadOnly(); }
         }
+        private List<Rectangle> layout = new List<Rectangle>();
+        
+        private SpiralPointsGenerator spiralPointsGenerator = new SpiralPointsGenerator();
 
         public CircularCloudLayouter(Point center) : base(center)
         {
@@ -51,35 +52,35 @@ namespace TagsCloudVisualization
 
         private Rectangle moveToCenter(Rectangle rect)
         {
-            var zero = new Vector(0, 0);
+            var zeroVector = new Vector(0, 0);
             var rectCenterX = Center.X - (rect.X + rect.Width / 2);
             var rectCenterY = Center.Y - (rect.Y - rect.Height / 2);
-            var vector = new Vector(rectCenterX, rectCenterY);
-            var tmp = new double[2] {rect.X, rect.Y};
+            var rectRadiusVector = new Vector(rectCenterX, rectCenterY);
+            var tmp = new double[2] { rect.X, rect.Y };
             Rectangle tmpRect;
 
-            if (!vector.Equals(zero))
-                vector.Normalize();
-            if (!vector.Equals(zero))
+            if (!rectRadiusVector.Equals(zeroVector))
+                rectRadiusVector.Normalize();
+            if (!rectRadiusVector.Equals(zeroVector))
             {
                 while (true)
                 {
                     tmpRect = new Rectangle((int) tmp[0], (int) tmp[1], rect.Width, rect.Height);
                     if (CheckIntersection(tmpRect))
                         break;
-                    tmp[0] += vector.X;
-                    tmp[1] += vector.Y;
+                    tmp[0] += rectRadiusVector.X;
+                    tmp[1] += rectRadiusVector.Y;
                 }
             }
 
-            var lastX = (int) (tmp[0] - vector.X);
-            var lastY = (int) (tmp[1] - vector.Y);
+            var lastX = (int) (tmp[0] - rectRadiusVector.X);
+            var lastY = (int) (tmp[1] - rectRadiusVector.Y);
             return new Rectangle(lastX, lastY, rect.Width, rect.Height);
         }
 
-        private bool CheckIntersection(Rectangle getRect)
+        private bool CheckIntersection(Rectangle rect)
         {
-            return layout.Any(getRect.IntersectsWith);
+            return layout.Any(rect.IntersectsWith);
         }
     }
 }

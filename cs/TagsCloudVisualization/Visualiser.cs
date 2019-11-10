@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Linq;
 
 namespace TagsCloudVisualization
 {
@@ -9,12 +10,12 @@ namespace TagsCloudVisualization
         public static Bitmap drawRectangles(CircularCloudLayouter ccl)
         {
             var bitmap = new Bitmap(4000, 4000);
-            Graphics graphics = Graphics.FromImage(bitmap);
-            SolidBrush brush = new SolidBrush(Color.Black);
-            Pen pen = new Pen(Color.Red, 10);
+            var graphics = Graphics.FromImage(bitmap);
+            var brush = new SolidBrush(Color.Black);
+            var pen = new Pen(Color.Red, 10);
             graphics.Clear(Color.White);
-            graphics.FillRectangles(brush, ccl.Layout.ToArray());
-            graphics.DrawRectangles(pen, ccl.Layout.ToArray());
+            graphics.FillRectangles(brush, ccl.RectanglesList.ToArray());
+            graphics.DrawRectangles(pen, ccl.RectanglesList.ToArray());
             return bitmap;
         }
 
@@ -46,7 +47,7 @@ namespace TagsCloudVisualization
             }
 
             CircularCloudLayouter testCcl = new CircularCloudLayouter(new Point(2000, 2000));
-            for (var i = 0; i < 25; i++)
+            for (var i = 0; i < 16; i++)
             {
                 testCcl.PutNextRectangle(new Size(300, 300));
             }

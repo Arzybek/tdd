@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
 using System.Windows;
 using FluentAssertions;
 using NUnit.Framework;
+using NUnit.Framework.Interfaces;
 using Point = System.Drawing.Point;
 using Size = System.Drawing.Size;
 
@@ -19,6 +22,20 @@ namespace TagsCloudVisualization
         {
             ccl = new CircularCloudLayouter(new Point(0, 0));
         }
+        
+        [TearDown]
+        public void TearDown()
+        {
+            if (TestContext.CurrentContext.Result.Outcome.Status == TestStatus.Failed)
+            {
+                var bitmap = Visualiser.drawRectangles(ccl, 1000, 1000);
+                var path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), 
+                    "TearDown.png");
+                bitmap.Save(path, ImageFormat.Png);
+                TestContext.WriteLine("Tag cloud visualization saved to file {0}", path);
+                return;
+            }
+        }
 
         [TestCase(1000, 1000)]
         [TestCase(300, 300)]
@@ -29,6 +46,18 @@ namespace TagsCloudVisualization
             ccl.PutNextRectangle(rectSize);
             var expectedRect = new Rectangle(new Point(-width / 2, height / 2), rectSize);
             ccl.RectanglesList[0].ShouldBeEquivalentTo(expectedRect);
+        }
+        
+        [Test]
+        public void TearDown_With_ImageAndMessage()
+        {
+            ccl = new CircularCloudLayouter(new Point(500,500));
+            var rectSize = new Size(50, 50);
+            for (var i = 0; i < 30; i++)
+            {
+                ccl.PutNextRectangle(rectSize);
+            }
+            true.Should().BeFalse();
         }
 
         [TestCase(1000)]
@@ -199,6 +228,12 @@ namespace TagsCloudVisualization
             Assert.AreEqual(Math.Abs(minY), Math.Abs(maxY), 25);
             Assert.AreEqual(maxRadVectLeftBot, maxRadVectRightTop, 25);
             Assert.AreEqual(maxRadVectRightBot, maxRadVectLeftTop, 25);
+            var xDiameter = Math.Abs(minX) + Math.Abs(maxX);
+            var yDiameter = Math.Abs(minY) + Math.Abs(maxY);
+            var leftToRightDiameter = maxRadVectLeftTop + maxRadVectRightBot;
+            var rightToLeftDiameter = maxRadVectRightTop + maxRadVectLeftBot;
+            Assert.AreEqual(xDiameter,yDiameter,25);
+            Assert.AreEqual(leftToRightDiameter,rightToLeftDiameter,25);
         }
     }
 }

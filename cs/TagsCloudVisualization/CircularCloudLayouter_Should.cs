@@ -28,7 +28,7 @@ namespace TagsCloudVisualization
         {
             if (TestContext.CurrentContext.Result.Outcome.Status == TestStatus.Failed)
             {
-                var bitmap = Visualiser.drawRectangles(ccl, 1000, 1000);
+                var bitmap = Visualiser.DrawRectangles(ccl, 1000, 1000);
                 var path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), 
                     "TearDown.png");
                 bitmap.Save(path, ImageFormat.Png);
@@ -133,12 +133,12 @@ namespace TagsCloudVisualization
         [Test]
         public void PutManyOneSizedRectangles_NotIntersects()
         {
-            initializeCclWithOneSizedRectangles(30);
+            InitializeCclWithOneSizedRectangles(30);
 
             CheckNotIntersection_EachWithEach();
         }
 
-        private Tuple<int, int, int, int> getMinAndMaxCoordinatesByAxis()
+        private (int minX, int maxX, int minY, int maxY) GetMinAndMaxCoordinatesByAxis()
         {
             int maxX = ccl.Center.X, minX = ccl.Center.X, maxY = ccl.Center.Y, minY = ccl.Center.Y;
             foreach (var rect in ccl.RectanglesList)
@@ -153,16 +153,16 @@ namespace TagsCloudVisualization
                     minX = rect.X;
             }
 
-            return Tuple.Create(minX, maxX, minY, maxY);
+            return (minX: minX, maxX: maxX, minY: minY, maxY: maxY);
         }
 
-        private double getOuterCircleRadius()
+        private double GetOuterCircleRadius()
         {
-            var minsAndMaxes = getMinAndMaxCoordinatesByAxis();
-            var minX = minsAndMaxes.Item1;
-            var maxX = minsAndMaxes.Item2;
-            var minY = minsAndMaxes.Item3;
-            var maxY = minsAndMaxes.Item4;
+            var minsAndMaxes = GetMinAndMaxCoordinatesByAxis();
+            var minX = minsAndMaxes.minX;
+            var maxX = minsAndMaxes.maxX;
+            var minY = minsAndMaxes.minY;
+            var maxY = minsAndMaxes.maxY;
 
             int X = Math.Max(Math.Abs(maxX), Math.Abs(minX));
             int Y = Math.Max(Math.Abs(maxY), Math.Abs(minY));
@@ -172,7 +172,7 @@ namespace TagsCloudVisualization
             return radiusOuterCircle;
         }
 
-        private void initializeCclWithOneSizedRectangles(int count, int width = 50, int height = 50)
+        private void InitializeCclWithOneSizedRectangles(int count, int width = 50, int height = 50)
         {
             var rectSize = new Size(50, 50);
             for (var i = 0; i < count; i++)
@@ -186,9 +186,9 @@ namespace TagsCloudVisualization
         [TestCase(25)]
         public void Layout_CheckThickness(int count)
         {
-            initializeCclWithOneSizedRectangles(count);
+            InitializeCclWithOneSizedRectangles(count);
 
-            var radiusOuterCircle = getOuterCircleRadius();
+            var radiusOuterCircle = GetOuterCircleRadius();
             var circleSquare = Math.PI * radiusOuterCircle * radiusOuterCircle;
             var rectanglesSquare = 0;
 
@@ -208,12 +208,12 @@ namespace TagsCloudVisualization
         [TestCase(25)]
         public void Layout_CheckCircleForm(int count)
         {
-            initializeCclWithOneSizedRectangles(count);
-            var minsAndMaxes = getMinAndMaxCoordinatesByAxis();
-            var minX = minsAndMaxes.Item1;
-            var maxX = minsAndMaxes.Item2;
-            var minY = minsAndMaxes.Item3;
-            var maxY = minsAndMaxes.Item4;
+            InitializeCclWithOneSizedRectangles(count);
+            var minsAndMaxes = GetMinAndMaxCoordinatesByAxis();
+            var minX = minsAndMaxes.minX;
+            var maxX = minsAndMaxes.maxX;
+            var minY = minsAndMaxes.minY;
+            var maxY = minsAndMaxes.maxY;
 
             var maxRadVectLeftTop = ccl.RectanglesList.Where(rectangle => rectangle.X < 0 && rectangle.Y > 0)
                 .Max(rectangle => new Vector(rectangle.X, rectangle.Y).Length);

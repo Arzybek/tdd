@@ -7,7 +7,7 @@ namespace TagsCloudVisualization
 {
     public class Visualiser
     {
-        public static Bitmap drawRectangles(CircularCloudLayouter ccl, int bitmapWidth=4000, int bitmapHeight=4000)
+        public static Bitmap DrawRectangles(CircularCloudLayouter ccl, int bitmapWidth=4000, int bitmapHeight=4000)
         {
             var bitmap = new Bitmap(bitmapWidth, bitmapHeight);
             var graphics = Graphics.FromImage(bitmap);
@@ -21,7 +21,7 @@ namespace TagsCloudVisualization
 
         public static void Main(string[] args)
         {
-            if (args.Length < 4)
+            if (args.Length == 0 || (args.Length < 4 && args.Length !=0 && args[0]!="-l" && args[0]!="-r"))
             {
                 System.Console.WriteLine("Please enter name of file, count of rectangles and size (width, height)");
                 System.Console.WriteLine("Usage: TagsCloudVisualization <file name> <count> <width> <height>");
@@ -45,7 +45,7 @@ namespace TagsCloudVisualization
                         oneSizedCcl.PutNextRectangle(new Size(width, height));
                     }
 
-                    var bitmap = drawRectangles(oneSizedCcl);
+                    var bitmap = DrawRectangles(oneSizedCcl);
                     bitmap.Save(fileName, ImageFormat.Png);
                     return;
                 }
@@ -69,7 +69,7 @@ namespace TagsCloudVisualization
                         oneSizedCcl.PutNextRectangle(new Size(width, height));
                     }
 
-                    var bitmap = drawRectangles(oneSizedCcl);
+                    var bitmap = DrawRectangles(oneSizedCcl);
                     bitmap.Save(fileName, ImageFormat.Png);
                     return;
                 }
@@ -95,7 +95,7 @@ namespace TagsCloudVisualization
                         randomCcl.PutNextRectangle(rectSize);
                     }
 
-                    var bitmap = drawRectangles(randomCcl);
+                    var bitmap = DrawRectangles(randomCcl);
                     bitmap.Save(fileName, ImageFormat.Png);
                     return;
                 }

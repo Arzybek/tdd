@@ -36,7 +36,7 @@ namespace TagsCloudVisualization
 
             while (true)
             {
-                var point = spiralPointsGenerator.getNextSpiralPoint();
+                var point = spiralPointsGenerator.GetNextSpiralPoint();
                 var top = Center.Y + point.Y + rectangleSize.Height / 2;
                 var left = Center.X + point.X - rectangleSize.Width / 2;
                 var rect = new Rectangle(new Point(left, top),
@@ -44,13 +44,13 @@ namespace TagsCloudVisualization
 
                 if (CheckIntersection(rect))
                     continue;
-                rect = moveToCenter(rect);
+                rect = MoveToCenter(rect);
                 layout.Add(rect);
                 return rect;
             }
         }
 
-        private Rectangle moveToCenter(Rectangle rect)
+        private Rectangle MoveToCenter(Rectangle rect)
         {
             var zeroVector = new Vector(0, 0);
             var rectCenterX = Center.X - (rect.X + rect.Width / 2);

@@ -9,7 +9,7 @@ namespace TagsCloudVisualization
         private double angleStep = 3.14 / 8;
         private double angle = 0;
         
-        public Point getNextSpiralPoint()
+        public Point GetNextSpiralPoint()
         {
             int X = (int) Math.Floor(spiralCoeff * angle * Math.Cos(angle));
             int Y = (int) Math.Floor(spiralCoeff * angle * Math.Sin(angle));

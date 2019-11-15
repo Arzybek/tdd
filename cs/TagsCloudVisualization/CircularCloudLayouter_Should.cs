@@ -48,18 +48,6 @@ namespace TagsCloudVisualization
             ccl.RectanglesList[0].ShouldBeEquivalentTo(expectedRect);
         }
         
-        [Test]
-        public void TearDown_With_ImageAndMessage()
-        {
-            ccl = new CircularCloudLayouter(new Point(500,500));
-            var rectSize = new Size(50, 50);
-            for (var i = 0; i < 30; i++)
-            {
-                ccl.PutNextRectangle(rectSize);
-            }
-            true.Should().BeFalse();
-        }
-
         [TestCase(1000)]
         [TestCase(300)]
         [TestCase(50)]
@@ -155,14 +143,23 @@ namespace TagsCloudVisualization
 
             return (minX: minX, maxX: maxX, minY: minY, maxY: maxY);
         }
+        
+        [Test]
+        public void CheckCorrectRadius()
+        {
+            ccl.Center = new Point(10,10);
+            ccl.PutNextRectangle(new Size(10, 10));
+            var radius = GetOuterCircleRadius();
+            Assert.AreEqual(7,radius, 1);
+        }
 
         private double GetOuterCircleRadius()
         {
             var minsAndMaxes = GetMinAndMaxCoordinatesByAxis();
-            var minX = minsAndMaxes.minX;
-            var maxX = minsAndMaxes.maxX;
-            var minY = minsAndMaxes.minY;
-            var maxY = minsAndMaxes.maxY;
+            var minX = minsAndMaxes.minX-ccl.Center.X;
+            var maxX = minsAndMaxes.maxX - ccl.Center.X;
+            var minY = minsAndMaxes.minY-ccl.Center.Y;
+            var maxY = minsAndMaxes.maxY - ccl.Center.Y;
 
             int X = Math.Max(Math.Abs(maxX), Math.Abs(minX));
             int Y = Math.Max(Math.Abs(maxY), Math.Abs(minY));
@@ -200,7 +197,7 @@ namespace TagsCloudVisualization
             var outerCircleSquare = rectanglesSquare * Math.PI / 2;
             var actualAcceptableSquare = circleSquare * 0.45;
 
-            Assert.True(actualAcceptableSquare <= outerCircleSquare);
+            actualAcceptableSquare.Should().BeLessOrEqualTo(outerCircleSquare);
         }
 
         [TestCase(9)]

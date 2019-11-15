@@ -12,7 +12,7 @@ namespace TagsCloudVisualization
 {
     public class CircularCloudLayouter : MustInitialize<Point>, ICircularCloudLayouter
     {
-        public Point Center { get; }
+        public Point Center { get; internal set; }
 
         public ReadOnlyCollection<Rectangle> RectanglesList
         {
@@ -56,26 +56,28 @@ namespace TagsCloudVisualization
             var rectCenterX = Center.X - (rect.X + rect.Width / 2);
             var rectCenterY = Center.Y - (rect.Y - rect.Height / 2);
             var rectRadiusVector = new Vector(rectCenterX, rectCenterY);
-            var tmp = new double[2] { rect.X, rect.Y };
+            double possibleXafterMove = rect.X;
+            double possibleYafterMove = rect.Y;
             Rectangle tmpRect;
 
             if (!rectRadiusVector.Equals(zeroVector))
-                rectRadiusVector.Normalize();
-            if (!rectRadiusVector.Equals(zeroVector))
             {
+                rectRadiusVector.Normalize();
                 while (true)
                 {
-                    tmpRect = new Rectangle((int) tmp[0], (int) tmp[1], rect.Width, rect.Height);
+                    possibleXafterMove += rectRadiusVector.X;
+                    possibleYafterMove += rectRadiusVector.Y;
+                    tmpRect = new Rectangle((int) possibleXafterMove, (int) possibleYafterMove, rect.Width, rect.Height);
                     if (CheckIntersection(tmpRect))
+                    {
+                        possibleXafterMove -= rectRadiusVector.X;
+                        possibleYafterMove -= rectRadiusVector.Y;
                         break;
-                    tmp[0] += rectRadiusVector.X;
-                    tmp[1] += rectRadiusVector.Y;
+                    }
                 }
             }
-
-            var lastX = (int) (tmp[0] - rectRadiusVector.X);
-            var lastY = (int) (tmp[1] - rectRadiusVector.Y);
-            return new Rectangle(lastX, lastY, rect.Width, rect.Height);
+            
+            return new Rectangle((int) possibleXafterMove, (int) possibleYafterMove, rect.Width, rect.Height);
         }
 
         private bool CheckIntersection(Rectangle rect)
